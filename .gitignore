@@ -1,0 +1,103 @@
+# ── Python & Bytecode ────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.manifest
+*.spec
+
+# ── Virtual Environments ─────────────────────────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ── Testing & Code Quality ───────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+nosetests.xml
+coverage.xml
+*.cover
+
+# ── Environment & Secrets ────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.local
+
+# ── Data & Raw Storage ───────────────────────────────────────────────────────
+data/raw/
+data/logs/
+data/processed/
+data/staging/
+data/gold/
+*.parquet
+*.feather
+*.h5
+*.hdf5
+
+# Keep landing zone directory placeholders
+!data/raw/.gitkeep
+!data/logs/.gitkeep
+
+# ── Machine Learning Artifacts & Models ───────────────────────────────────────
+models/*.pkl
+models/*.joblib
+models/*.pt
+models/*.pth
+models/*.onnx
+*.pkl
+*.joblib
+mlruns/
+.mlflow/
+wandb/
+
+# ── Jupyter Notebooks ─────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# ── Airflow & Databases ───────────────────────────────────────────────────────
+airflow.cfg
+airflow.db
+airflow-webserver.pid
+logs/
+postgres_data/
+*.sqlite
+*.sqlite3
+*.db
+
+# ── Streamlit ─────────────────────────────────────────────────────────────────
+.streamlit/secrets.toml
+
+# ── IDEs & Editors ────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ── Operating System ──────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+[Nn]otebook.log
