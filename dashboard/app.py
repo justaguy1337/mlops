@@ -18,7 +18,6 @@ Via Docker:
     Open http://localhost:8501
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -66,6 +65,13 @@ html, body, [class*="css"] {
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #161b22 0%, #0d1117 100%);
     border-right: 1px solid #30363d;
+}
+[data-testid="stSidebarNavItems"] {
+    max-height: none !important;
+}
+[data-testid="stSidebarNavViewButton"],
+[data-testid="stSidebarNavSeparator"] {
+    display: none !important;
 }
 
 /* Metric cards */
