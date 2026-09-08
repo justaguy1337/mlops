@@ -15,7 +15,8 @@ from typing import Generator
 
 import pandas as pd
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, text, Engine
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 

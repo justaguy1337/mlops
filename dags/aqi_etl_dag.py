@@ -97,7 +97,7 @@ def validate_and_clean(**context) -> dict:
     Logs rejected records to data/logs/error_log.csv.
     """
     from etl.validate import validate_measurements, validate_weather
-    from db.db_utils import read_sql, df_to_table
+    from db.db_utils import read_sql, upsert_dataframe
     import uuid
     import pandas as pd
 
@@ -116,11 +116,27 @@ def validate_and_clean(**context) -> dict:
     if not df_valid_aq.empty:
         df_valid_aq["cleaned_at"] = pd.Timestamp.utcnow()
         df_valid_aq["is_valid"] = True
-        df_to_table(df_valid_aq, "air_quality", "cleaned")
+        aq_cols = [
+            "location_id", "station_name", "city", "country",
+            "latitude", "longitude", "parameter", "value_ugm3",
+            "measured_at_utc", "measured_at_ist",
+            "aqi_sub_index", "is_valid", "cleaned_at",
+        ]
+        aq_to_load = df_valid_aq[[c for c in aq_cols if c in df_valid_aq.columns]].copy()
+        aq_to_load = aq_to_load.drop_duplicates(
+            subset=["location_id", "parameter", "measured_at_utc"], keep="last"
+        )
+        upsert_dataframe(
+            df=aq_to_load,
+            table="air_quality",
+            schema="cleaned",
+            conflict_columns=["location_id", "parameter", "measured_at_utc"],
+            update_columns=[c for c in aq_to_load.columns if c not in ["location_id", "parameter", "measured_at_utc"]],
+        )
 
     # ── Validate weather ──
     df_staging_weather = read_sql(
-        "SELECT * FROM staging.weather WHERE extraction_date::text = :dt",
+        "SELECT * FROM staging.weather WHERE date(measured_at_ist) = CAST(:dt AS date)",
         {"dt": extraction_date_str},
     )
     weather_result = validate_weather(df_staging_weather, run_id=run_id)
@@ -128,7 +144,23 @@ def validate_and_clean(**context) -> dict:
 
     if not df_valid_weather.empty:
         df_valid_weather["cleaned_at"] = pd.Timestamp.utcnow()
-        df_to_table(df_valid_weather, "weather", "cleaned")
+        weather_cols = [
+            "city", "measured_at_utc", "measured_at_ist",
+            "temperature_2m", "relative_humidity_2m", "wind_speed_10m",
+            "wind_direction_10m", "precipitation", "surface_pressure",
+            "cloud_cover", "cleaned_at",
+        ]
+        weather_to_load = df_valid_weather[[c for c in weather_cols if c in df_valid_weather.columns]].copy()
+        weather_to_load = weather_to_load.drop_duplicates(
+            subset=["city", "measured_at_utc"], keep="last"
+        )
+        upsert_dataframe(
+            df=weather_to_load,
+            table="weather",
+            schema="cleaned",
+            conflict_columns=["city", "measured_at_utc"],
+            update_columns=[c for c in weather_to_load.columns if c not in ["city", "measured_at_utc"]],
+        )
 
     result = {
         "aq_valid": len(df_valid_aq),
@@ -177,11 +209,11 @@ def run_build_gold_layer(**context) -> dict:
     extraction_date_str = str(logical_date.date())
 
     df_cleaned_aq = read_sql(
-        "SELECT * FROM cleaned.air_quality WHERE extraction_date::text = :dt",
+        "SELECT * FROM cleaned.air_quality WHERE date(measured_at_ist) = CAST(:dt AS date)",
         {"dt": extraction_date_str},
     )
     df_cleaned_weather = read_sql(
-        "SELECT * FROM cleaned.weather WHERE date(measured_at_ist) = :dt::date",
+        "SELECT * FROM cleaned.weather WHERE date(measured_at_ist) = CAST(:dt AS date)",
         {"dt": extraction_date_str},
     )
 
@@ -206,7 +238,7 @@ def identify_data_gaps(**context) -> None:
 
     df = read_sql(
         "SELECT location_id, parameter, measured_at_utc FROM cleaned.air_quality "
-        "WHERE extraction_date::text = :dt",
+        "WHERE date(measured_at_ist) = CAST(:dt AS date)",
         {"dt": extraction_date_str},
     )
 

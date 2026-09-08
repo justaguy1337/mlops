@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 import streamlit as st
 import pandas as pd
-from datetime import timedelta
+from datetime import date, timedelta
 
 from dashboard.utils.db_queries import get_cities, get_date_range, get_aqi_trend, get_rolling_aqi
 from dashboard.utils.charts import aqi_trend_line, rolling_aqi_comparison
@@ -38,6 +38,12 @@ st.markdown("Track daily Air Quality Index over time for selected Indian cities.
 
 cities = get_cities()
 min_date, max_date = get_date_range()
+# Guard: get_date_range() can return None if the table is empty
+today = date.today()
+if min_date is None:
+    min_date = today - timedelta(days=30)
+if max_date is None:
+    max_date = today
 default_start = max(min_date, max_date - timedelta(days=30))
 
 with st.sidebar:

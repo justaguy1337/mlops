@@ -242,5 +242,25 @@ def normalize_weather(raw_records: list[dict]) -> pd.DataFrame:
     if before - len(df) > 0:
         logger.info("Dropped %d weather records with missing city/timestamp", before - len(df))
 
+    # Keep only columns matching staging.weather schema
+    staging_columns = [
+        "city",
+        "measured_at_utc",
+        "measured_at_ist",
+        "temperature_2m",
+        "relative_humidity_2m",
+        "wind_speed_10m",
+        "wind_direction_10m",
+        "precipitation",
+        "surface_pressure",
+        "cloud_cover",
+    ]
+    for col in staging_columns:
+        if col not in df.columns:
+            df[col] = None
+    if "raw_id" not in df.columns:
+        df["raw_id"] = None
+    df = df[["raw_id"] + staging_columns]
+
     logger.info("Normalized %d weather records", len(df))
     return df

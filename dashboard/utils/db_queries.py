@@ -40,20 +40,42 @@ def get_cities() -> list[str]:
     """Return list of cities with data in the gold layer."""
     try:
         df = _read("SELECT DISTINCT city FROM gold.daily_city_aqi ORDER BY city")
-        return df["city"].tolist()
+        cities = df["city"].dropna().tolist()
+        return cities if cities else ["Delhi", "Mumbai", "Bengaluru", "Chennai", "Kolkata"]
     except Exception:
         return ["Delhi", "Mumbai", "Bengaluru", "Chennai", "Kolkata"]
 
 
-@st.cache_data(ttl=3600)
 def get_date_range() -> tuple[date, date]:
-    """Return the min/max date range available in the gold layer."""
+    """Return the min/max date range available in the gold layer.
+    NOT cached — always runs fresh so stale None values never slip through.
+    Falls back to (today-30, today) when the table is empty or unreachable.
+    """
+    today = date.today()
+    fallback: tuple[date, date] = (today - timedelta(days=30), today)
     try:
         df = _read("SELECT MIN(date_ist) AS min_date, MAX(date_ist) AS max_date FROM gold.daily_city_aqi")
-        return df["min_date"].iloc[0], df["max_date"].iloc[0]
+        if df.empty:
+            return fallback
+        min_val = df["min_date"].iloc[0]
+        max_val = df["max_date"].iloc[0]
+        # SQL MIN/MAX on empty table → NULL → Python None / pandas NaT
+        if min_val is None or max_val is None:
+            return fallback
+        try:
+            if pd.isna(min_val) or pd.isna(max_val):
+                return fallback
+        except (TypeError, ValueError):
+            return fallback
+        # Convert pandas Timestamp → plain date if needed
+        min_val = min_val.date() if hasattr(min_val, "date") else min_val
+        max_val = max_val.date() if hasattr(max_val, "date") else max_val
+        # Final type safety check
+        if not isinstance(min_val, date) or not isinstance(max_val, date):
+            return fallback
+        return min_val, max_val
     except Exception:
-        today = date.today()
-        return today - timedelta(days=30), today
+        return fallback
 
 
 # ── Page 1: AQI Trend ─────────────────────────────────────────────────────────

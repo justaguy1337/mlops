@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 import streamlit as st
 import pandas as pd
-from datetime import timedelta
+from datetime import date, timedelta
 
 from dashboard.utils.db_queries import get_date_range, get_city_comparison, get_city_stats
 from dashboard.utils.charts import city_comparison_heatmap, city_avg_aqi_bar
@@ -37,6 +37,9 @@ st.markdown("Compare AQI performance across Delhi, Mumbai, Bengaluru, Chennai, a
 # ── Sidebar controls ──────────────────────────────────────────────────────────
 
 min_date, max_date = get_date_range()
+today = date.today()
+if min_date is None: min_date = today - timedelta(days=30)
+if max_date is None: max_date = today
 default_start = max(min_date, max_date - timedelta(days=30))
 
 with st.sidebar:

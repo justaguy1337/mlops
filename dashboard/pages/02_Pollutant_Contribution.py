@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 import streamlit as st
 import pandas as pd
-from datetime import timedelta
+from datetime import date, timedelta
 
 from dashboard.utils.db_queries import get_cities, get_date_range, get_pollutant_contribution
 from dashboard.utils.charts import pollutant_pie, pollutant_stacked_bar, pollutant_avg_bar
@@ -39,6 +39,9 @@ st.markdown("Understand which pollutants are driving the AQI in each city.")
 
 cities = get_cities()
 min_date, max_date = get_date_range()
+today = date.today()
+if min_date is None: min_date = today - timedelta(days=30)
+if max_date is None: max_date = today
 default_start = max(min_date, max_date - timedelta(days=30))
 
 with st.sidebar:
