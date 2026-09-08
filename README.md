@@ -66,7 +66,7 @@ ml-ops/
 │   └── db_utils.py              # SQLAlchemy helpers + upsert
 │
 ├── dashboard/                   # Streamlit app
-│   ├── app.py                   # Home page + navigation
+│   ├── Home.py                  # Home page + navigation
 │   ├── Dockerfile
 │   ├── pages/                   # 5 analytics pages
 │   └── utils/                   # Cached queries + chart builders

@@ -30,8 +30,6 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 [data-testid="stSidebar"] { background: #161b22; border-right: 1px solid #30363d; }
 [data-testid="stSidebarNavItems"] { max-height: none !important; }
 [data-testid="stSidebarNavViewButton"], [data-testid="stSidebarNavSeparator"] { display: none !important; }
-[data-testid="stSidebarNavItems"] li:first-child a span { display: none !important; }
-[data-testid="stSidebarNavItems"] li:first-child a::after { content: "Home" !important; color: inherit; font-size: 0.875rem; font-weight: inherit; }
 </style>
 """, unsafe_allow_html=True)
 

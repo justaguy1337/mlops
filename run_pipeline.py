@@ -15,7 +15,7 @@ Steps:
     5. Load cleaned tables
     6. Build gold layer (AQI + analytics tables)
 
-After this finishes, run: streamlit run dashboard/app.py
+After this finishes, run: streamlit run dashboard/Home.py
 """
 
 from __future__ import annotations
@@ -173,7 +173,7 @@ def run(extraction_date: date) -> None:
     print("  ✅ Pipeline complete!")
     print(f"{'='*60}")
     print("\nNext step: launch the dashboard")
-    print("    streamlit run dashboard/app.py")
+    print("    streamlit run dashboard/Home.py")
     print("    Then open: http://localhost:8501\n")
 
 

@@ -29,6 +29,7 @@ x-airflow-common: &airflow-common
     - ./etl:/opt/airflow/etl
     - ./db:/opt/airflow/db
     - ./data:/opt/airflow/data
+    - ./run_pipeline.py:/opt/airflow/run_pipeline.py
     - airflow_logs:/opt/airflow/logs
     - airflow_plugins:/opt/airflow/plugins
   depends_on:
@@ -116,6 +117,7 @@ services:
       POSTGRES_HOST: postgres
     ports:
       - "8501:8501"
+    command: streamlit run dashboard/Home.py --server.port=8501 --server.address=0.0.0.0 --server.headless=true --browser.gatherUsageStats=false
     volumes:
       - ./dashboard:/app/dashboard
       - ./data:/app/data
@@ -125,6 +127,16 @@ services:
     networks:
       - aqi_net
     restart: unless-stopped
+
+  # ── Pipeline Runner (One-Shot Ingestion + ETL) ───────────────────────────────
+  pipeline:
+    <<: *airflow-common
+    container_name: aqi_pipeline_runner
+    command: python run_pipeline.py
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:
