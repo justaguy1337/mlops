@@ -99,8 +99,8 @@ ml-ops/
 ### 1. Clone & Configure
 
 ```bash
-git clone <your-repo-url>
-cd ml-ops
+git clone <https://github.com/justaguy1337/mlops.git>
+cd mlops
 
 # Copy environment template and edit your values
 cp .env.example .env
